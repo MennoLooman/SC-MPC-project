@@ -1,6 +1,7 @@
 function [sys] = con_System()
 %continuous time model
 %equilibrium at: x_eq = [0,0,0,0,1,0,0,0]'
+% Ik ben er ook joepie
 
 %constants:
 i_11 = 4.250; %inertia of spacecraft: kgm^2
