@@ -1,7 +1,7 @@
 function [x] = dis_System(x0,u)
 %discrete time system describtion
 %x0 : initial state at time t0 of size 8x1
-%u  : input signal for T time steps of size 4xT
+%u  : input signal for T time steps of size 4x7T
 
     [~,T] = size(u);
     x(1) = x0;

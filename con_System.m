@@ -1,4 +1,4 @@
-function [sys] = con_System()
+function [A,B] = con_System()
 %continuous time model
 %equilibrium at: x_eq = [0,0,0,0,1,0,0,0]'
 
@@ -13,8 +13,19 @@ k_y = (i_11 - i_33) / i_22;
 k_z = (i_22 - i_11) / i_33;
 k = i_22 - I_w;
 
-sys.A;
-sys.B;
+A = zeros(7);
+B = zeros(7,4);
+A(1,3) = (1-k_x)*w_0;
+A(1,5) = -8*k_x*w_0^2;
+A(2,6) = -6*k_y*i_22*w_0^2/k;
+A(3,1) = (k_z-1)*w_0;
+A(3,7) = -2*k_z*w_0^2;
+A(4,6) = 6*k_y*i_22*w_0^2/k;
+A(5,1) = 1/2;
+A(6,2) = 1/2;
+A(7,3) = 1/2;
+
+
 
 end
 
