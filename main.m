@@ -31,3 +31,7 @@ input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; -0.0484; -0.0484; -0.0398; -0.00
 %% Simulate system
 [~,~,x_dis] = lsim(sys_con,u,t,x0);
 %notice that x_dis is transposed
+
+%% Objective Function LQR
+Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
+R = diag([200, 200, 200, 1]);
