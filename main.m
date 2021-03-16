@@ -52,9 +52,11 @@ for k = 1:N_horizon
    Constraints = [Constraints, x{k+1} == A_dis*x{k} + B_dis*u{k}];
 end
 
-% !there might be an mistake in the controller input!
-%Controller = optimizer(Constraints,Objective,[],x0_var,[u{:}]);
-Controller = optimizer(Constraints,Objective,[],x0_var,u{1}); %do only want first column of u
+% which is best
+%Controller = optimizer(Constraints,Objective,[],x0_var,[u{:}]); %from instructions
+Controller = optimizer(Constraints,Objective,[],x0_var,u{1}); %from instructions
+%Controller = optimizer(Constraints,Objective,[],x0_var,u); %conplete u
 
 %% results from controller
-u_result = Controller{x0};
+u_result = Controller{x0'};
+u_result = u_result(:,1);
