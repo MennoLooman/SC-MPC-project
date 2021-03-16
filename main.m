@@ -26,7 +26,7 @@ state_bounds = [max_state_bounds; -max_state_bounds];
 
 %% Input constraints in the form Gu <= input_bounds
 G = [eye(N_inputs); -eye(N_inputs)];
-input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; -0.0484; -0.0484; -0.0398; -0.0020];
+input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; 0.0484; 0.0484; 0.0398; 0.0020];
 
 %% Simulate system
 [~,~,x_dis] = lsim(sys_con,u,t,x0);
@@ -37,19 +37,21 @@ Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
 N_horizon = 2;
-P = sdpvar(7,7);
-x0_var = sdpvar(7,1);
+P = 10000*eye(7);
+%x0_var = sdpvar(7,1);
 u = sdpvar(4,N_horizon);
+x = sdpvar(7,N_horizon+1);
 
-x = x0_var;
-Constraints = [];
+%x = x0_var;
+Constraints = x(:,1)==x0;
 Objective = x(:,end)'*P*x(:,end);
 for i = 1:N_horizon
-   x = A_dis*x+B_dis*u(:,i);
-   Objective = Objective + 0.5*(x'*Q*x+u(:,i)'*R*u(:,i));
-   Constraints = [Constraints; G*u(:,i)<= input_bounds; F*x <= state_bounds];
+   %x = A_dis*x+B_dis*u(:,i);
+   Objective = Objective + 0.5*(x(:,i)'*Q*x(:,i)+u(:,i)'*R*u(:,i));
+   Constraints = [Constraints; G*u(:,i)<= input_bounds; F*x(:,i) <= state_bounds; x(:,i+1)==A_dis*x(:,i)+B_dis*u(:,i)];
 end
-sol = optimize([Constraints,x0_var==x0],Objective);
+sol = optimize(Constraints,Objective);
+if sol.problem == 1, error("problem in YALMIP: " + sol.info); end
 
 %% results YALMIP
 u_result = value(u);
