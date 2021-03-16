@@ -39,7 +39,7 @@ R = diag([200, 200, 200, 1]);
 
 N_horizon = 2;
 P = 1*eye(N_states);
-x0_var = sdpvar(1,1);
+x0_var = sdpvar(7,1);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
 u = sdpvar(repmat(N_inputs,1,N_horizon), repmat(1,1,N_horizon));
 
@@ -52,11 +52,7 @@ for k = 1:N_horizon
    Constraints = [Constraints, x{k+1} == A_dis*x{k} + B_dis*u{k}];
 end
 
-% which is best
-%Controller = optimizer(Constraints,Objective,[],x0_var,[u{:}]); %from instructions
-Controller = optimizer(Constraints,Objective,[],x0_var,u{1}); %from instructions
-%Controller = optimizer(Constraints,Objective,[],x0_var,u); %conplete u
+Controller = optimizer(Constraints,Objective,[],x0_var,u{1});
 
 %% results from controller
-u_result = Controller{x0'};
-u_result = u_result(:,1);
+u_result = Controller{x0};
