@@ -36,26 +36,14 @@ input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; -0.0484; -0.0484; -0.0398; -0.00
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
-N_horizon = 2;
-P = sdpvar(7,7);
-x0_var = sdpvar(7,1);
+P = sdpvar(8,8);
+x0_var = sdpvar(8,1);
 u = sdpvar(4,N_horizon);
-
-x = x0_var;
+N_horizon = 2;
 Constraints = [];
 Objective = x(:,end)'*P*x(:,end);
 for i = 1:N_horizon
-   x = A_dis*x+B_dis*u(:,i);
-   Objective = Objective + 0.5*(x'*Q*x+u(:,i)'*R*u(:,i));
-   Constraints = [Constraints; G*u(:,i)<= input_bounds; F*x <= state_bounds];
+   Objective = Objective + 0.5*(x(:,i)'*Q*x(:,i)+u(:,i)'*R*u(:,i));
+   Constraints = [Constratins; G*u(i)<= input_bounds; F*x(i) <= state_bounds];
 end
-sol = optimize([Constraints,x0_var==x0],Objective);
-
-%% results YALMIP
-u_result = value(u);
-plot(u_result(1,:),[0,1]);
-hold on
-for i=2:4
-   plot(u_result(i,:),[0,1]);
-end
-hold off
+sol = optimize(Constraints,Objective);
