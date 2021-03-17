@@ -3,11 +3,18 @@ N_inputs = 4;
 N_states = 7;
 
 %% Initial state, input
+% state x = [w_1 w_2 w_3 w_w e_1 e_2 e_3]';
+% w_i : angular velocity of the body frame relative to the orbit frame
+% w_w : angular velocity of the wheel relative to the body
+% e_i : Euler parameters (toghether with n)
+% input u = [t_1 t_2 t_3 t_w]';
+% t_i : torque provided from thrusters
+% t_w : internal axial torques applied by the platform to the wheel
+
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';%initial state
 dt = 0.1; %sampling rate
-N_steps = 100; %number of time steps
+N_steps = 250; %number of time steps
 t = 0:dt:dt*(N_steps-1);
-u = ones(N_inputs,N_steps); %input at every time step
 
 %% Continuous state space model
 [A_con,B_con] = con_System();
@@ -20,6 +27,11 @@ sys_dis = c2d(sys_con,dt);
 A_dis = sys_dis.A;
 B_dis = sys_dis.B;
 
+%% Simulate system
+u = ones(N_inputs,N_steps); %input at every time step
+[~,~,x_dis] = lsim(sys_con,u,t,x0);
+%notice that x_dis is transposed
+
 %% State constraints in the form Fx <= state_bounds
 F = [eye(N_states); -eye(N_states)];
 max_state_bounds = [1; 1; 1; 800; 1; 1; 1];
@@ -28,10 +40,6 @@ state_bounds = [max_state_bounds; max_state_bounds];
 %% Input constraints in the form Gu <= input_bounds
 G = [eye(N_inputs); -eye(N_inputs)];
 input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; 0.0484; 0.0484; 0.0398; 0.0020];
-
-%% Simulate system
-[~,~,x_dis] = lsim(sys_con,u,t,x0);
-%notice that x_dis is transposed
 
 %% Objective Function LQR
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
@@ -54,5 +62,34 @@ end
 
 Controller = optimizer(Constraints,Objective,[],x0_var,u{1});
 
-%% results from controller
-u_result = Controller{x0};
+%% Run Controller
+x_save = zeros(N_states, N_steps);
+u_save = zeros(N_inputs, N_steps);
+x = x0;
+for i = 1:N_steps
+    u = Controller{x};
+    u_save(:,i) = u;
+    x = A_dis * x + B_dis * u;
+    x_save(:,i) = x;
+end
+
+%% plot results
+tiledlayout(2,1)
+% plot inputs
+nexttile
+hold on
+for i = 1:N_inputs
+    plot(t,u_save(i,:),'DisplayName',"u_"+num2str(i))
+end
+hold off
+legend
+title('Inputs over time')
+% plot states
+nexttile
+hold on
+for i = 1:N_states
+    plot(t,x_save(i,:),'DisplayName',"x_"+num2str(i))
+end
+hold off
+legend
+title('States over time')
