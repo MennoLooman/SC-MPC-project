@@ -13,7 +13,7 @@ N_states = 7;
 
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';%initial state
 dt = 0.1; %sampling rate
-N_steps = 1500; %number of time steps
+N_steps = 5000; %number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
@@ -74,6 +74,7 @@ for i = 1:N_steps
 end
 
 %% plot results
+fig1 = figure();
 tiledlayout(2,1)
 
 % plot inputs
@@ -95,3 +96,7 @@ end
 hold off
 legend
 title('States over time')
+
+%save figure
+figfile = fullfile("figures", "N_step="+num2str(N_steps)+"_N_hor="+num2str(N_horizon));
+saveas(fig1,figfile);
