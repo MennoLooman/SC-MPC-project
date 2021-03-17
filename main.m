@@ -1,4 +1,4 @@
-close all; clear all; clear variables; clear variables; clc;
+close all; clear all; clc;
 N_inputs = 4;
 N_states = 7;
 
@@ -13,7 +13,7 @@ N_states = 7;
 
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';%initial state
 dt = 0.1; %sampling rate
-N_steps = 250; %number of time steps
+N_steps = 1500; %number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
@@ -45,7 +45,7 @@ input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; 0.0484; 0.0484; 0.0398; 0.0020];
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
-N_horizon = 2;
+N_horizon = 5; % <5 does not work; then x_5 becomes >1 over time
 P = 1*eye(N_states);
 x0_var = sdpvar(7,1);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
@@ -75,6 +75,7 @@ end
 
 %% plot results
 tiledlayout(2,1)
+
 % plot inputs
 nexttile
 hold on
@@ -84,6 +85,7 @@ end
 hold off
 legend
 title('Inputs over time')
+
 % plot states
 nexttile
 hold on
