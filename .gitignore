@@ -1,2 +1,4 @@
 # catches all .asv files
 *.asv
+# does not automatically update figures
+figure/
