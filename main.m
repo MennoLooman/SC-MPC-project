@@ -13,7 +13,8 @@ N_states = 7;
 
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';%initial state
 dt = 0.1; %sampling rate
-N_steps = 1000; %number of time steps
+N_horizon = 5; % <5 does not work; then x_5 becomes >1 over time
+N_steps = 5000; %number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
@@ -45,8 +46,8 @@ input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; 0.0484; 0.0484; 0.0398; 0.0020];
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
-N_horizon = 6; % <5 does not work; then x_5 becomes >1 over time
-P = 1*eye(N_states);
+P_gain = 100;
+P = P_gain*eye(N_states);
 x0_var = sdpvar(7,1);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
 u = sdpvar(repmat(N_inputs,1,N_horizon), repmat(1,1,N_horizon));
@@ -84,6 +85,7 @@ for i = 1:N_inputs
     plot(t,u_save(i,:),'DisplayName',"u_"+num2str(i))
 end
 hold off
+xlabel('Time [sec]')
 legend
 title('Inputs over time')
 
@@ -94,9 +96,27 @@ for i = 1:N_states
     plot(t,x_save(i,:),'DisplayName',"x_"+num2str(i))
 end
 hold off
+xlabel('Time [sec]')
 legend
 title('States over time')
 
-%save figure
-figfile = fullfile("figures", "N_step="+num2str(N_steps)+"_N_hor="+num2str(N_horizon));
+%% save figure
+figfile = fullfile("figures", "N_step="+num2str(N_steps)+"_N_hor="+num2str(N_horizon)+"_P="+num2str(P_gain));
 saveas(fig1,figfile);
+return % to not run the continue running controller code
+
+%% Continue running controller
+N_extra_steps = 5000;
+if N_steps ~= size(x_save,2), error(['size of N_steps and x/u_save does not match' newline 'fix issue to run Continue running controller']); end
+
+x_save = [x_save, zeros(N_states, N_extra_steps)];
+u_save = [u_save, zeros(N_inputs, N_extra_steps)];
+x = x_save(:,N_steps);
+for i = N_steps + (1:N_extra_steps)
+    u = Controller{x};
+    u_save(:,i) = u;
+    x = A_dis * x + B_dis * u;
+    x_save(:,i) = x;
+end
+N_steps = N_steps + N_extra_steps;
+t = 0:dt:dt*(N_steps-1);
