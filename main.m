@@ -20,7 +20,7 @@ t = 0:dt:dt*(N_steps-1);
 %% Continuous state space model
 [A_con,B_con] = con_System();
 D_con = zeros(N_states,N_inputs);
-C_con = eye(N_states);
+C_con = eye(N_states); % idea: change C to only measure first 4 physicall states (sys still observable)
 sys_con = ss(A_con,B_con,C_con,D_con);
 
 %% Discretise system (less accurate then lsim)
@@ -46,7 +46,7 @@ input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; 0.0484; 0.0484; 0.0398; 0.0020];
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
-P_gain = 100;
+P_gain = 100; % weight of terminal cost
 P = P_gain*eye(N_states);
 x0_var = sdpvar(7,1);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
@@ -106,7 +106,11 @@ saveas(fig1,figfile);
 return % to not run the continue running controller code
 
 %% Continue running controller
+% once an controller is established, you can run extra steps without much
+% extra calculations. Only need to change the number of extra steps you want.
 N_extra_steps = 5000;
+
+%error catch to check if sizes still match
 if N_steps ~= size(x_save,2), error(['size of N_steps and x/u_save does not match' newline 'fix issue to run Continue running controller']); end
 
 x_save = [x_save, zeros(N_states, N_extra_steps)];
@@ -118,5 +122,6 @@ for i = N_steps + (1:N_extra_steps)
     x = A_dis * x + B_dis * u;
     x_save(:,i) = x;
 end
+
 N_steps = N_steps + N_extra_steps;
 t = 0:dt:dt*(N_steps-1);
