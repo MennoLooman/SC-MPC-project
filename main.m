@@ -13,7 +13,7 @@ N_states = 7;
 
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';    % initial state
 dt = 0.1;                               % sampling rate
-N_horizon = 5;                          % <5 does not work; then x_5 becomes >1 over time
+N_horizon = 6;                          % <5 does not work; then x_5 becomes >1 over time
 N_steps = 500;                          % number of time steps
 t = 0:dt:dt*(N_steps-1);
 
@@ -41,35 +41,38 @@ F = [eye(N_states); -eye(N_states)];
 max_state_bounds = [1; 1; 1; 800; 1; 1; 1];
 state_bounds = [max_state_bounds; max_state_bounds];
 
-% Input constraints in the form Gu <= input_bounds
-G = [eye(N_inputs); -eye(N_inputs)];
-input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; 0.0484; 0.0484; 0.0398; 0.0020];
+% Input constraints
+int_in_bounds = diag([0.0484; 0.0484; 0.0398]); %0.0020
 
 %% Objective Function LQR
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
-P_gain = 100; % weight of terminal cost
+P_gain = 1000; % weight of terminal cost
 P = P_gain*eye(N_states);
 x0_var = sdpvar(7,1);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
-u = sdpvar(repmat(N_inputs,1,N_horizon), repmat(1,1,N_horizon));
+u_int = intvar(repmat(N_inputs-1,1,N_horizon), ones(1,N_horizon));
+u_var = sdpvar(repmat(1,1,N_horizon), ones(1,N_horizon));
+% u = [u_int; u_var]
 
 Constraints = [x{1}==x0_var]; 
 Objective = x{end}'*P*x{end};
 
 for k = 1:N_horizon
-   Objective = Objective + 0.5*( x{k}'*Q*x{k} + u{k}'*R*u{k} );
-   Constraints = [Constraints, G*u{k} <= input_bounds, F*x{k} <= state_bounds];
-   Constraints = [Constraints, x{k+1} == A_dis*x{k} + B_dis*u{k}];
+   Objective = Objective + 0.5*( x{k}'*Q*x{k} + ([int_in_bounds*u_int{k};u_var{k}])'*R*[int_in_bounds*u_int{k};u_var{k}] );
+   Constraints = [Constraints, F*x{k} <= state_bounds];%, G*u{k} <= input_bounds
+   Constraints = [Constraints, x{k+1} == A_dis*x{k} + B_dis*[int_in_bounds*u_int{k};u_var{k}]];
+   Constraints = [Constraints, -1 <= u_int{k} <=1, -0.0020 <= u_var{k} <= 0.0020];
 end
 
-Controller = optimizer(Constraints,Objective,[],x0_var,u{1});
+Controller = optimizer(Constraints,Objective,[],x0_var,[int_in_bounds*u_int{1};u_var{1}]);
 
 %% Run Controller
 x_save = zeros(N_states, N_steps);
 u_save = zeros(N_inputs, N_steps);
 x = x0;
+
 for i = 1:N_steps
     u = Controller{x};
     u_save(:,i) = u;
@@ -117,7 +120,7 @@ return % to not run the continue running controller code
 %% Continue running controller
 % once an controller is established, you can run extra steps without much
 % extra calculations. Only need to change the number of extra steps you want.
-N_extra_steps = 5000;
+N_extra_steps = 100;
 
 %error catch to check if sizes still match
 if N_steps ~= size(x_save,2), error(['size of N_steps and x/u_save does not match' newline 'fix issue to run Continue running controller']); end
