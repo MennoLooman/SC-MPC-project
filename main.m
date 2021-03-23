@@ -1,8 +1,6 @@
-close all; %clear all; clc;
+close all; clear all; clc;
 N_inputs = 4;
 N_states = 7;
-
-recover_eight_state(x_save)
 
 %% Initial state, input
 % state x = [w_1 w_2 w_3 w_w e_1 e_2 e_3]';
@@ -13,10 +11,10 @@ recover_eight_state(x_save)
 % - t_i : torque provided from thrusters
 % - t_w : internal axial torques applied by the platform to the wheel
 
-x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';%initial state
-dt = 0.1; %sampling rate
-N_horizon = 5; % <5 does not work; then x_5 becomes >1 over time
-N_steps = 500; %number of time steps
+x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';    % initial state
+dt = 0.1;                               % sampling rate
+N_horizon = 5;                          % <5 does not work; then x_5 becomes >1 over time
+N_steps = 500;                          % number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
@@ -25,22 +23,25 @@ D_con = zeros(N_states,N_inputs);
 C_con = eye(N_states); % idea: change C to only measure first 4 physicall states (sys still observable)
 sys_con = ss(A_con,B_con,C_con,D_con);
 
+clear D_con C_con
+
 %% Discretise system (less accurate then lsim)
-sys_dis = c2d(sys_con,dt);
+sys_dis = c2d(sys_con, dt, 'zoh');
 A_dis = sys_dis.A;
 B_dis = sys_dis.B;
 
-%% Simulate system
+% Simulate discrete system
 u = ones(N_inputs,N_steps); %input at every time step
 [~,~,x_dis] = lsim(sys_con,u,t,x0);
-%notice that x_dis is transposed
+x_dis = x_dis';
 
-%% State constraints in the form Fx <= state_bounds
+%% Constraints definition
+% State constraints in the form Fx <= state_bounds
 F = [eye(N_states); -eye(N_states)];
 max_state_bounds = [1; 1; 1; 800; 1; 1; 1];
 state_bounds = [max_state_bounds; max_state_bounds];
 
-%% Input constraints in the form Gu <= input_bounds
+% Input constraints in the form Gu <= input_bounds
 G = [eye(N_inputs); -eye(N_inputs)];
 input_bounds = [0.0484; 0.0484; 0.0398; 0.0020; 0.0484; 0.0484; 0.0398; 0.0020];
 
@@ -74,6 +75,12 @@ for i = 1:N_steps
     u_save(:,i) = u;
     x = A_dis * x + B_dis * u;
     x_save(:,i) = x;
+end
+
+x_complete = recover_eight_state(x_save);
+x_euler = zeros(3, N_steps);
+for k = 1:N_steps
+    x_euler(:,k) = quat2eul(x_complete(5:8, k)')';
 end
 
 %% plot results
