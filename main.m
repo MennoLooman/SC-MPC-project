@@ -14,7 +14,7 @@ N_states = 7;
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';    % initial state
 dt = 0.1;                               % sampling rate
 N_horizon = 6;                          % <5 does not work; then x_5 becomes >1 over time
-N_steps = 40;                          % number of time steps
+N_steps = 200;                          % number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
@@ -112,6 +112,8 @@ xlabel('Time [sec]')
 legend
 title('States over time')
 
+return % to not run the save figure code
+
 %% save figure
 figfile = fullfile("figures", "N_step="+num2str(N_steps)+"_N_hor="+num2str(N_horizon)+"_P="+num2str(P_gain));
 if ~isfile(figfile+".fig")
@@ -123,7 +125,7 @@ return % to not run the continue running controller code
 %% Continue running controller
 % once an controller is established, you can run extra steps without much
 % extra calculations. Only need to change the number of extra steps you want.
-N_extra_steps = 100;
+N_extra_steps = 200;
 
 %error catch to check if sizes still match
 if N_steps ~= size(x_save,2), error(['size of N_steps and x/u_save does not match' newline 'fix issue to run Continue running controller']); end
