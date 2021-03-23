@@ -14,7 +14,7 @@ N_states = 7;
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';    % initial state
 dt = 0.1;                               % sampling rate
 N_horizon = 6;                          % <5 does not work; then x_5 becomes >1 over time
-N_steps = 500;                          % number of time steps
+N_steps = 40;                          % number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
@@ -114,7 +114,10 @@ title('States over time')
 
 %% save figure
 figfile = fullfile("figures", "N_step="+num2str(N_steps)+"_N_hor="+num2str(N_horizon)+"_P="+num2str(P_gain));
-saveas(fig1,figfile);
+if ~isfile(figfile+".fig")
+    saveas(fig1,figfile);
+end
+
 return % to not run the continue running controller code
 
 %% Continue running controller
