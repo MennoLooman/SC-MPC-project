@@ -13,8 +13,8 @@ N_states = 7;
 
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';    % initial state
 dt = 0.1;                               % sampling rate
-N_horizon = 6;                          % <5 does not work; then x_5 becomes >1 over time
-N_steps = 200;                          % number of time steps
+N_horizon = 7;                          % <5 does not work; then x_5 becomes >1 over time
+N_steps = 500;                          % number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
@@ -88,12 +88,12 @@ end
 
 %% plot results
 fig1 = figure();
-tiledlayout(2,1)
+tiledlayout(2,2)
 
 % plot inputs
 nexttile
 hold on
-for i = 1:N_inputs
+for i = 1:N_inputs-1
     plot(t,u_save(i,:),'DisplayName',"u_"+num2str(i))
 end
 hold off
@@ -101,9 +101,20 @@ xlabel('Time [sec]')
 legend
 title('Inputs over time')
 
-% plot states
 nexttile
 hold on
+plot([0,N_steps*dt],-0.0020*ones(1,2),'--k')
+plot([0,N_steps*dt],0.0020*ones(1,2),'--k')
+plot(t,u_save(4,:),'DisplayName',"u_4")
+hold off
+xlabel('Time [sec]')
+legend
+
+% plot states
+nexttile(3,[1,2])
+hold on
+plot([0,N_steps*dt],-1*ones(1,2),'--k')
+plot([0,N_steps*dt],1*ones(1,2),'--k')
 for i = 1:N_states
     plot(t,x_save(i,:),'DisplayName',"x_"+num2str(i))
 end
