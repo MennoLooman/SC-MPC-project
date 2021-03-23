@@ -1,20 +1,22 @@
-close all; clear all; clc;
+close all; %clear all; clc;
 N_inputs = 4;
 N_states = 7;
 
+recover_eight_state(x_save)
+
 %% Initial state, input
 % state x = [w_1 w_2 w_3 w_w e_1 e_2 e_3]';
-% w_i : angular velocity of the body frame relative to the orbit frame
-% w_w : angular velocity of the wheel relative to the body
-% e_i : Euler parameters (toghether with n)
-% input u = [t_1 t_2 t_3 t_w]';
-% t_i : torque provided from thrusters
-% t_w : internal axial torques applied by the platform to the wheel
+% - w_i : angular velocity of the body frame relative to the orbit frame
+% - w_w : angular velocity of the wheel relative to the body
+% - e_i : Euler parameters (toghether with n)
+% - input u = [t_1 t_2 t_3 t_w]';
+% - t_i : torque provided from thrusters
+% - t_w : internal axial torques applied by the platform to the wheel
 
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';%initial state
 dt = 0.1; %sampling rate
 N_horizon = 5; % <5 does not work; then x_5 becomes >1 over time
-N_steps = 5000; %number of time steps
+N_steps = 500; %number of time steps
 t = 0:dt:dt*(N_steps-1);
 
 %% Continuous state space model
