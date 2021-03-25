@@ -51,34 +51,44 @@ R = diag([200, 200, 200, 1]);
 P_gain = 1000; % weight of terminal cost
 P = P_gain*eye(N_states);
 x0_var = sdpvar(7,1);
+u_tilde = sdpvar(N_inputs,N_horizon);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
+x_tilde = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
 u_int = intvar(repmat(N_inputs-1,1,N_horizon), ones(1,N_horizon));
 u_var = sdpvar(repmat(1,1,N_horizon), ones(1,N_horizon));
-% u = [u_int; u_var]
+u_tot = sdpvar(repmat(N_inputs,1,N_horizon), ones(1,N_horizon));
 
 Constraints = [x{1}==x0_var]; 
-Objective = x{end}'*P*x{end};
+Constraints = [x_tilde{1}==x0_var];
+Objective_u = x{end}'*P*x{end};
+Objective_u_tilde = x_tilde{end}'*P*x_tilde{end};
 
 for k = 1:N_horizon
-   Objective = Objective + 0.5*( x{k}'*Q*x{k} + ([int_in_bounds*u_int{k};u_var{k}])'*R*[int_in_bounds*u_int{k};u_var{k}] );
+   u_tot{k} = ([int_in_bounds*u_int{k};u_var{k}]);
+   Objective_u = Objective_u + 0.5*( x{k}'*Q*x{k} + u_tot{k}'*R*u_tot{k} );
+   Objective_u_tilde = Objective_u_tilde + 0.5*( x_tilde{k}'*Q*x_tilde{k} + u_tilde(:,k)'*R*u_tilde(:,k) );
    Constraints = [Constraints, F*x{k} <= state_bounds];%, G*u{k} <= input_bounds
-   Constraints = [Constraints, x{k+1} == A_dis*x{k} + B_dis*[int_in_bounds*u_int{k};u_var{k}]];
+   Constraints = [Constraints, x{k+1} == A_dis*x{k} + B_dis*u_tot{k}];
+   Constraints = [Constraints, x_tilde{k+1} == A_dis*x_tilde{k} + B_dis*u_tilde(:,k)];
    Constraints = [Constraints, -1 <= u_int{k} <=1, -0.0020 <= u_var{k} <= 0.0020];
 end
+Constraints = [Constraints, Objective_u <= Objective_u_tilde];%0.999*
 
-Controller = optimizer(Constraints,Objective,[],x0_var,[int_in_bounds*u_int{1};u_var{1}]);
+Controller = optimizer(Constraints,[],[],{x0_var, u_tilde},u_tot);
 
 %% Run Controller
 
 N_states = N_states+1;
 x_save = zeros(N_states, N_steps);
 u_save = zeros(N_inputs, N_steps);
+u_tilde = zeros(N_inputs, N_horizon); %this initial input needs to be valid for first N_horizon steps!
 x = [x0; 1];
 
 for i = 1:N_steps
-    u = Controller{x(1:7)};
-    u_save(:,i) = u;
-    x = x + dt * non_lin_model(x,u); %euler forward method, only first order approximation
+    u = cell2mat(Controller{x(1:7),u_tilde});
+    u_save(:,i) = u(:,1);
+    u_tilde = [u(:,2:N_horizon) zeros(N_inputs,1)];
+    x = x + dt * non_lin_model(x,u(:,1)); %euler forward method, only first order approximation
     x_save(:,i) = x;
 end
 
