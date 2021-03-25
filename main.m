@@ -13,7 +13,7 @@ N_states = 7;
 
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';    % initial state
 dt = 0.1;                               % sampling rate
-N_horizon = 7;                          % <5 does not work; then x_5 becomes >1 over time
+N_horizon = 6;                          % <5 does not work; then x_5 becomes >1 over time
 N_steps = 500;                          % number of time steps
 t = 0:dt:dt*(N_steps-1);
 
@@ -45,6 +45,7 @@ state_bounds = [max_state_bounds; max_state_bounds];
 int_in_bounds = diag([0.0484; 0.0484; 0.0398]); %0.0020
 
 %% Objective Function LQR
+tic
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
@@ -67,18 +68,21 @@ for k = 1:N_horizon
 end
 
 Controller = optimizer(Constraints,Objective,[],x0_var,[int_in_bounds*u_int{1};u_var{1}]);
-
+time_build = toc;
 %% Run Controller
+tic
+N_states = N_states+1;
 x_save = zeros(N_states, N_steps);
 u_save = zeros(N_inputs, N_steps);
-x = x0;
+x = [x0; 1];
 
 for i = 1:N_steps
-    u = Controller{x};
+    u = Controller{x(1:7)};
     u_save(:,i) = u;
-    x = A_dis * x + B_dis * u;
+    x = x + dt * non_lin_model(x,u); %euler forward method, only first order approximation
     x_save(:,i) = x;
 end
+time_run = toc;
 
 x_complete = recover_eight_state(x_save);
 x_euler = zeros(3, N_steps);
@@ -102,20 +106,28 @@ legend
 title('Inputs over time')
 
 nexttile
-hold on
-plot([0,N_steps*dt],-0.0020*ones(1,2),'--k')
-plot([0,N_steps*dt],0.0020*ones(1,2),'--k')
 plot(t,u_save(4,:),'DisplayName',"u_4")
-hold off
-xlabel('Time [sec]')
 legend
+axis([-inf inf -2e-3 2e-3]);
+xlabel('Time [sec]')
 
 % plot states
-nexttile(3,[1,2])
+%note that the state is: x=[w_1 w_2 w_3 w_w e_1 e_2 e_3, n]' with n last
+%nexttile(3,[1,2])
+nexttile
 hold on
-plot([0,N_steps*dt],-1*ones(1,2),'--k')
-plot([0,N_steps*dt],1*ones(1,2),'--k')
-for i = 1:N_states
+for i = [1:3 5:7]
+    plot(t,x_save(i,:),'DisplayName',"x_"+num2str(i))
+end
+hold off
+axis([-inf inf -1 1])
+xlabel('Time [sec]')
+legend
+title('States over time')
+
+nexttile
+hold on
+for i = [4,8]
     plot(t,x_save(i,:),'DisplayName',"x_"+num2str(i))
 end
 hold off
@@ -136,7 +148,8 @@ return % to not run the continue running controller code
 %% Continue running controller
 % once an controller is established, you can run extra steps without much
 % extra calculations. Only need to change the number of extra steps you want.
-N_extra_steps = 200;
+tic
+N_extra_steps = 500;
 
 %error catch to check if sizes still match
 if N_steps ~= size(x_save,2), error(['size of N_steps and x/u_save does not match' newline 'fix issue to run Continue running controller']); end
@@ -145,11 +158,12 @@ x_save = [x_save, zeros(N_states, N_extra_steps)];
 u_save = [u_save, zeros(N_inputs, N_extra_steps)];
 x = x_save(:,N_steps);
 for i = N_steps + (1:N_extra_steps)
-    u = Controller{x};
+    u = Controller{x(1:7)};
     u_save(:,i) = u;
-    x = A_dis * x + B_dis * u;
+    x = x + dt * non_lin_model(x,u); %euler forward method, only first order approximation
     x_save(:,i) = x;
 end
 
 N_steps = N_steps + N_extra_steps;
 t = 0:dt:dt*(N_steps-1);
+time_run = toc;
