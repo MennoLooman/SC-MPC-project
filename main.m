@@ -45,7 +45,6 @@ state_bounds = [max_state_bounds; max_state_bounds];
 int_in_bounds = diag([0.0484; 0.0484; 0.0398]); %0.0020
 
 %% Objective Function LQR
-tic
 Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
 R = diag([200, 200, 200, 1]);
 
@@ -68,9 +67,9 @@ for k = 1:N_horizon
 end
 
 Controller = optimizer(Constraints,Objective,[],x0_var,[int_in_bounds*u_int{1};u_var{1}]);
-time_build = toc;
+
 %% Run Controller
-tic
+
 N_states = N_states+1;
 x_save = zeros(N_states, N_steps);
 u_save = zeros(N_inputs, N_steps);
@@ -82,13 +81,12 @@ for i = 1:N_steps
     x = x + dt * non_lin_model(x,u); %euler forward method, only first order approximation
     x_save(:,i) = x;
 end
-time_run = toc;
 
-x_complete = recover_eight_state(x_save);
-x_euler = zeros(3, N_steps);
-for k = 1:N_steps
-    x_euler(:,k) = quat2eul(x_complete(5:8, k)')';
-end
+% x_complete = recover_eight_state(x_save);
+% x_euler = zeros(3, N_steps);
+% for k = 1:N_steps
+%     x_euler(:,k) = quat2eul(x_complete(5:8, k)')';
+% end
 
 %% plot results
 fig1 = figure();
@@ -149,7 +147,7 @@ return % to not run the continue running controller code
 % once an controller is established, you can run extra steps without much
 % extra calculations. Only need to change the number of extra steps you want.
 tic
-N_extra_steps = 500;
+N_extra_steps = 2500;
 
 %error catch to check if sizes still match
 if N_steps ~= size(x_save,2), error(['size of N_steps and x/u_save does not match' newline 'fix issue to run Continue running controller']); end
