@@ -4,6 +4,7 @@ R = diag([200, 200, 200, 1]);
 
 P = P_gain*eye(N_states);
 x0_var = sdpvar(7,1);
+temp = sdpvar(1,1);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));
 u_int = intvar(repmat(N_inputs-1,1,N_horizon), ones(1,N_horizon));
 u_var = sdpvar(repmat(1,1,N_horizon), ones(1,N_horizon));
@@ -20,4 +21,4 @@ for k = 1:N_horizon
    Constraints = [Constraints, -1 <= u_int{k} <=1, -0.0020 <= u_var{k} <= 0.0020];
 end
 
-Controller = optimizer(Constraints,Objective,[],x0_var,u_tot);
+Controller = optimizer(Constraints,Objective,[],{x0_var,temp},u_tot{1});

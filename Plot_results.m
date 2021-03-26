@@ -25,7 +25,7 @@ xlabel('Time [sec]')
 nexttile
 hold on
 for i = [1:3 5:7]
-    plot(t,x_save(i,:),'DisplayName',"x_"+num2str(i))
+    plot(t,x_save(i,2:end),'DisplayName',"x_"+num2str(i))
 end
 hold off
 axis([-inf inf -1 1])
@@ -34,9 +34,10 @@ legend
 title('States over time')
 
 nexttile
+if rr_non_lin_model, plot_range = [4,8]; else, plot_range = 4; end
 hold on
-for i = [4,8]
-    plot(t,x_save(i,:),'DisplayName',"x_"+num2str(i))
+for i = plot_range
+    plot(t,x_save(i,2:end),'DisplayName',"x_"+num2str(i))
 end
 hold off
 xlabel('Time [sec]')

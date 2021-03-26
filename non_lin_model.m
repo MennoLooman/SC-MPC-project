@@ -16,8 +16,8 @@ n = x(8); %n = sqrt(1-e'*e);
 I = diag([4.250, 4.337, 3.664]);
 I_w = 4e-5;
 L = [0,1,0]';
-J = diag([4.25 4.33696 3.664]);%J = I-L*I_w*L'; %time save
-J_inv = diag([1/4.25 1/4.33696 1/3.664]);%J_inv = inv(J); %time save
+J = diag([4.25 4.33696 3.664]); %J = I-L*I_w*L'; %time save
+J_inv = diag([1/4.25 1/4.33696 1/3.664]); %J_inv = inv(J); %time save
 w_0 = 3.1e3 / 42e6;
 Rb_o = eye(3)+2*n*skew(e)+2*skew(e)*skew(e); %not sure about this line
 dRb_o = -skew(wb_ob)*Rb_o;
@@ -26,8 +26,8 @@ c_3 = Rb_o(:,3);
 dc_2 = dRb_o(:,2);
 
 % dwb_ob and dw_w
-f_h_inert = J_inv*cross(-wb_ob+w_0*c_2,I*wb_ob-w_0*c_2+L*I_w*w_w);
-f_d_inert = L'*J_inv*cross(wb_ob-w_0*c_2,I*wb_ob-w_0*c_2+L*I_w*w_w);
+f_h_inert = J_inv*(-skew(wb_ob-w_0*c_2)*(I*(wb_ob-w_0*c_2)+L*I_w*w_w));
+f_d_inert = L'*J_inv*skew(wb_ob-w_0*c_2)*(I*(wb_ob-w_0*c_2)+L*I_w*w_w);
 f_h_t = J_inv*tau - J_inv*L*tau_w;
 f_d_t = -L'*J_inv*tau + (L'*J_inv*L+I_w^-1)*tau_w;
 f_h_g = J_inv*cross(3*w_0^2*c_3,I*c_3);

@@ -16,7 +16,8 @@ u_save = [];
 %% Continuous state space model
 [A_con,B_con] = con_System();
 D_con = zeros(N_states,N_inputs);
-C_con = eye(N_states); % idea: change C to only measure first 4 physicall states (sys still observable)
+C_con = eye(N_states); 
+%C_con = [eye(4) zeros(4,N_states-4))]; % idea: change C to only measure first 4 physicall states (sys still observable)
 sys_con = ss(A_con,B_con,C_con,D_con);
 
 %% Discretise system (less accurate then lsim)

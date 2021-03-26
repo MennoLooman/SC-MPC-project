@@ -29,3 +29,5 @@ end
 Constraints = [Constraints, Objective_u <= 0.9*Objective_u_tilde];
 
 Controller = optimizer(Constraints,[],[],{x0_var, u_tilde},u_tot);
+%still in doubt if it should be u_tot or u_tot{1}
+%suboptimal and normal MPC give different objects back to controller..
