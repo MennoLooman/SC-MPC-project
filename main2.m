@@ -4,10 +4,10 @@ clear all; clc;
 x0 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0]';    % initial state
 dt = 0.1;                               % sampling rate
 N_horizon = 6;                          % <5 does not work; then x_5 becomes >1 over time
-N_extra_steps = 500;                    % number of steps each run
-P_gain = 1000;                          % weight of terminal cost
+N_extra_steps = 2000;                    % number of steps each run
+P_gain = 100;                          % weight of terminal cost
 rr_suboptimal_MPC = 0;                  % run sys using suboptimal MPC or finite horizon MPC
-rr_non_lin_model = 1;                   % run sys using the linearised or original system
+rr_non_lin_model = 0;                   % run sys using the linearised or original system
 rr_save_figures = 0;                    % flag if figure needs to be saved
 
 % define system
