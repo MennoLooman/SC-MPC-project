@@ -1,9 +1,4 @@
 %% Objective Function LQR
-Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
-R = diag([200, 200, 200, 1]);
-
-P_gain = 1000; % weight of terminal cost
-P = P_gain*eye(N_states);
 x0_var = sdpvar(7,1);
 u_tilde = sdpvar(N_inputs,N_horizon);
 x = sdpvar(repmat(N_states,1,N_horizon+1),repmat(1,1,N_horizon+1));

@@ -33,3 +33,8 @@ state_bounds = [max_state_bounds; max_state_bounds];
 
 % Input constraints
 int_in_bounds = diag([0.0484; 0.0484; 0.0398]); %0.0020
+
+% def LQR terms
+P = P_gain*eye(N_states);
+Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
+R = diag([200, 200, 200, 1]);
