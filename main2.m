@@ -26,8 +26,8 @@ end
 %% Run model with controller
 if ~rr_non_lin_model
     %linear model
-    Run_lin %not compatable, needs fix
-    plot_non_lin
+    Run_lin
+    plot_non_lin % runs input generated using lin model on non lin system
 else
     %nonlinear model
     Run_non_lin

@@ -1,4 +1,4 @@
-x_save2 = [0.1 0.0 0.0 0.0 0.0 0.0 0.0 1]';
+x_save2 = [x0;1];
 x_save2 = [x_save2, zeros(N_states+1, N_extra_steps)];
 for i = (1:N_extra_steps)
     x_save2(:,i+1) = x_save2(:,i) + dt * non_lin_model(x_save2(:,i),u_save(:,i)); %euler forward method, only first order approximation
