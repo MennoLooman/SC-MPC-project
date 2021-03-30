@@ -8,7 +8,7 @@ u_var = sdpvar(repmat(1,1,N_horizon), ones(1,N_horizon));
 u_tot = sdpvar(repmat(N_inputs,1,N_horizon), ones(1,N_horizon));
 
 Constraints = [x{1}==x0_var]; 
-Constraints = [x_tilde{1}==x0_var];
+Constraints = [Constraints, x_tilde{1}==x0_var];
 Objective_u = x{end}'*P*x{end};
 Objective_u_tilde = x_tilde{end}'*P*x_tilde{end};
 
@@ -21,7 +21,7 @@ for k = 1:N_horizon
    Constraints = [Constraints, x_tilde{k+1} == A_dis*x_tilde{k} + B_dis*u_tilde(:,k)];
    Constraints = [Constraints, -1 <= u_int{k} <=1, -0.0020 <= u_var{k} <= 0.0020];
 end
-Constraints = [Constraints, Objective_u <= 0.9*Objective_u_tilde];
+Constraints = [Constraints, Objective_u <= 0.999*Objective_u_tilde];
 
 Controller = optimizer(Constraints,[],[],{x0_var, u_tilde},u_tot);
 %still in doubt if it should be u_tot or u_tot{1}
