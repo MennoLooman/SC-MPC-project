@@ -12,6 +12,8 @@ N_states = 7;
 N_steps = 0;
 x_save = x0;
 u_save = [];
+x_LQR = x0;
+u_LQR = [];
 
 %% Continuous state space model
 [A_con,B_con] = con_System();
@@ -32,9 +34,12 @@ max_state_bounds = [1; 1; 1; 800; 1; 1; 1];
 state_bounds = [max_state_bounds; max_state_bounds];
 
 % Input constraints
-int_in_bounds = diag([0.0484; 0.0484; 0.0398]); %0.0020
+input_bounds = [0.0484; 0.0484; 0.0398; 0.0020];
+int_in_bounds = diag(input_bounds(1:3)); 
 
-% def LQR terms
+%% def LQR terms
 P = P_gain*eye(N_states);
-Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
-R = diag([200, 200, 200, 1]);
+%Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
+Q = diag([500, 500, 500, 1e-7, 500, 500, 500]);
+%R = diag([200, 200, 200, 1]);
+R = diag([0, 0, 0, 0]);
