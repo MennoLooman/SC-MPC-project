@@ -1,3 +1,5 @@
+global P
+
 [P_LQR,K_LQR,L_LQR,info] = idare(A_dis,B_dis,Q,R,[],[]);
 P = P_gain * P_LQR;
 if info.Report>0

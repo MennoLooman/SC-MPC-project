@@ -49,7 +49,7 @@ if rr_non_lin_model, title_lin = "with nonlinear model"; else, title_lin = "with
 title(til1,title_MPC+title_lin)
 
 %% plot results of LQR optimal control
-if rr_solve_DARE
+if 0%rr_solve_DARE
     fig3 = figure();
     til3 = tiledlayout(2,2);
 

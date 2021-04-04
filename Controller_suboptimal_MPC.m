@@ -16,7 +16,7 @@ for k = 1:N_horizon
    u_tot{k} = ([int_in_bounds*u_int{k};u_var{k}]);
    Objective_u = Objective_u + 0.5*( x{k}'*Q*x{k} + u_tot{k}'*R*u_tot{k} );
    Objective_u_tilde = Objective_u_tilde + 0.5*( x_tilde{k}'*Q*x_tilde{k} + u_tilde(:,k)'*R*u_tilde(:,k) );
-   Constraints = [Constraints, F*x{k} <= state_bounds];%, G*u{k} <= input_bounds
+   Constraints = [Constraints, F*x{k+1} <= state_bounds];%, G*u{k} <= input_bounds
    Constraints = [Constraints, x{k+1} == A_dis*x{k} + B_dis*u_tot{k}];
    Constraints = [Constraints, x_tilde{k+1} == A_dis*x_tilde{k} + B_dis*u_tilde(:,k)];
    Constraints = [Constraints, -1 <= u_int{k} <=1, -0.0020 <= u_var{k} <= 0.0020];

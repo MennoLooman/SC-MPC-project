@@ -7,6 +7,16 @@
 % - t_i : torque provided from thrusters
 % - t_w : internal axial torques applied by the platform to the wheel
 
+global N_inputs
+global N_states
+global A_dis
+global B_dis
+global int_in_bounds
+global max_state_bounds
+global R
+global Q
+global P
+
 N_inputs = 4;
 N_states = 7;
 N_steps = 0;
@@ -40,6 +50,6 @@ int_in_bounds = diag(input_bounds(1:3));
 %% def LQR terms
 P = P_gain*eye(N_states);
 %Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
-Q = diag([500, 500, 500, 1e-7, 500, 500, 500]);
+Q = diag([5, 5, 5, 1e-7, 500, 500, 500]);
 %R = diag([200, 200, 200, 1]);
 R = diag([0, 0, 0, 0]);
