@@ -13,8 +13,6 @@ global A_dis
 global B_dis
 global int_in_bounds
 global max_state_bounds
-global R
-global Q
 global P
 
 N_inputs = 4;
@@ -24,6 +22,8 @@ x_save = x0;
 u_save = [];
 x_LQR = x0;
 u_LQR = [];
+obj_save = [];
+obj2_save = [];
 
 %% Continuous state space model
 [A_con,B_con] = con_System();
@@ -49,7 +49,3 @@ int_in_bounds = diag(input_bounds(1:3));
 
 %% def LQR terms
 P = P_gain*eye(N_states);
-%Q = diag([500, 500, 500, 1e-7, 1, 1, 1]);
-Q = diag([5, 5, 5, 1e-7, 500, 500, 500]);
-%R = diag([200, 200, 200, 1]);
-R = diag([0, 0, 0, 0]);

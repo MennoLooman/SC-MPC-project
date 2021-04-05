@@ -1,8 +1,8 @@
 global P
 
-[P_LQR,K_LQR,L_LQR,info] = idare(A_dis,B_dis,Q,R,[],[]);
+[P_LQR,K_LQR,L_LQR,info_LQR] = idare(A_dis,B_dis,Q,R,[],[]);
 P = P_gain * P_LQR;
-if info.Report>0
+if info_LQR.Report>0
    error("solve_DARE: DARE not solved properly"); 
 end
 
