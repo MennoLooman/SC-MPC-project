@@ -14,7 +14,7 @@ rr_solve_DARE = 1;                      % use P from DARE solution and obtian LQ
 rr_save_figures = 0;                    % flag if figure needs to be saved
 
 % define system
-def_sys;
+def_sys();
 if rr_solve_DARE, solve_DARE; end
 %--------------------------------------------------------------------------
 %% build controller
