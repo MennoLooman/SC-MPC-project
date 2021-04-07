@@ -14,6 +14,7 @@ function [u_result,x_result,Objective_result,Objective_result2] = Controller_sub
     u_var = sdpvar(repmat(1,1,N_horizon), ones(1,N_horizon));
     u_tot = sdpvar(N_inputs,N_horizon);
     x_tilde = [x0_var, sdpvar(7,N_horizon)];
+    slack = sdpvar(1);
 
     Constraints = [];
     Objective_u = 0;
@@ -33,10 +34,10 @@ function [u_result,x_result,Objective_result,Objective_result2] = Controller_sub
     end
     Objective_u = Objective_u + 0.5*x(:,N_horizon+1)'*P*x(:,N_horizon+1);
     Objective_u_tilde = Objective_u_tilde + 0.5*x_tilde(:,N_horizon+1)'*P*x_tilde(:,N_horizon+1);
-    Constraints = [Constraints; Objective_u <= Objective_u_tilde]; %sufficient condition!!! 
+    Constraints = [Constraints; Objective_u <= Objective_u_tilde + slack; slack>=0]; %sufficient condition!!! 
 
     options = sdpsettings('solver','mosek','verbose',0,'mosek.MSK_IPAR_SIM_MAX_ITERATIONS',100);
-    sol = optimize(Constraints,Objective_u,options);
+    sol = optimize(Constraints,slack,options);
     u_result = value(u_tot);
     x_result = value(x);
     Objective_result = value(Objective_u);
