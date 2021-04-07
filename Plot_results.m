@@ -1,5 +1,27 @@
 %% plot results
 t = 0:dt:dt*(N_steps-1);
+
+if length(x_save(:,1)) == 7
+    x_save_8 = recover_eight_state(x_save);
+elseif length(x_save(:,1)) == 8
+    x_save_8 = x_save;
+else
+    error("error converting state to 8 states");
+end
+
+% convert quaternions to euler angles.
+euler = zeros(3, length(x_save_8));
+for i =1:length(x_save_8)
+    euler(:,i) = rad2deg(quat2eul(x_save_8(5:8, i)'));
+end
+
+figure(10); hold on; grid on; % Plot euler angles
+plot(t, euler(1,2:end), 'DisplayName','yaw', 'LineWidth', 2);
+plot(t, euler(2,2:end), 'DisplayName','pitch', 'LineWidth', 2);
+plot(t, euler(3,2:end), 'DisplayName','roll', 'LineWidth', 2);
+legend(); title('Orientation of satellite in Euler angles');
+xlabel('Time [sec]'); ylabel('Angle [deg]');
+
 if rr_suboptimal_MPC
     fig1 = figure();
     til1 = tiledlayout(2,2);
@@ -113,4 +135,20 @@ if rr_solve_DARE==2
     title('States over time')
 
     title(til3,"LQR optimal control")
+end
+
+function [state_seq_8] = recover_eight_state(state_seq_7)
+%RECOVER_EIGHT_STATE Returns the complete state description based on the
+%states comming from the MPC
+%   only works when simulation time is > 7
+%   the extra state is inserted in the place as mentioned to the article.
+    N = length(state_seq_7);
+    state_seq_8 = zeros(8, N);
+    state_seq_8(1:4, :) = state_seq_7(1:4, :);
+    state_seq_8(6:8, :) = state_seq_7(5:7, :);
+    
+    for i = 1:N
+        eta = sqrt(1 - state_seq_8(6:8, i)'*state_seq_8(6:8, i));
+        state_seq_8(5, i) = eta;
+    end
 end

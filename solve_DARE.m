@@ -3,11 +3,6 @@ global P
 [P_LQR,K_LQR,L_LQR,info_LQR] = idare(A_dis,B_dis,Q,R,[],[]);
 P = P_gain * P_LQR;
 
-% Test for solving the discrete Lyaponuv function is different than P
-% above.
-P_test = dlyap(A_dis + B_dis*K_LQR, (Q + K_LQR'*R*K_LQR));
-
-
 if info_LQR.Report > 0
    error("solve_DARE: DARE not solved properly"); 
 end
