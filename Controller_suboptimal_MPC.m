@@ -35,7 +35,7 @@ function [u_result,x_result,Objective_result,Objective_result2] = Controller_sub
     Objective_u_tilde = Objective_u_tilde + 0.5*x_tilde(:,N_horizon+1)'*P*x_tilde(:,N_horizon+1);
     Constraints = [Constraints; Objective_u <= Objective_u_tilde]; %sufficient condition!!! 
 
-    options = sdpsettings('solver','mosek','verbose',1,'mosek.MSK_IPAR_SIM_MAX_ITERATIONS',100);
+    options = sdpsettings('solver','mosek','verbose',0,'mosek.MSK_IPAR_SIM_MAX_ITERATIONS',100);
     sol = optimize(Constraints,Objective_u,options);
     u_result = value(u_tot);
     x_result = value(x);

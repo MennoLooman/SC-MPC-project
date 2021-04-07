@@ -14,7 +14,7 @@ if rr_suboptimal_MPC
     x_save = [x_save, zeros(N_states, N_extra_steps)];
     u_save = [u_save, zeros(N_inputs, N_extra_steps)];
     obj_save = [obj_save, zeros(1,N_extra_steps)];
-
+        
     for i = N_steps + (1:N_extra_steps)
         if rr_suboptimal_MPC == 2
             [u,x,obj,obj2] = Controller_suboptimal_MPC(x_save(:,i),u_tilde); 
@@ -26,6 +26,23 @@ if rr_suboptimal_MPC
         obj_save(i) = obj;
         u_save(:,i) = u(:,1);
         x_save(:,i+1) = A_dis * x_save(:,i) + B_dis * u(:,1);
+    end
+    
+    %time estimate single run
+    if rr_suboptimal_MPC == 2
+        tic
+        Controller_suboptimal_MPC(x_save(:,1),zeros(N_inputs, N_horizon)); 
+        time_sub_MPC = toc;
+        tic
+        Controller_suboptimal_MPC(x_save(:,i+1),u_tilde); 
+        time_sub_MPC = [time_sub_MPC, toc];
+    else
+        tic
+        Controller_MPC(x_save(:,1)); 
+        time_MPC = toc;
+        tic
+        Controller_MPC(x_save(:,i+1)); 
+        time_MPC = [time_MPC, toc];
     end
 end
 

@@ -28,7 +28,7 @@ function [u_result,x_result,Objective_result,sol] = Controller_MPC(x0_var)
     end
     Objective = Objective + 0.5*x(:,N_horizon+1)'*P*x(:,N_horizon+1);
 
-    options = sdpsettings('solver','mosek','verbose',1,'mosek.MSK_IPAR_SIM_MAX_ITERATIONS',100);
+    options = sdpsettings('solver','mosek','verbose',0,'mosek.MSK_IPAR_SIM_MAX_ITERATIONS',100);
     sol = optimize(Constraints,Objective,options);
     u_result = value(u_tot);
     x_result = value(x);

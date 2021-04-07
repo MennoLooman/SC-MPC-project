@@ -36,6 +36,23 @@ if rr_suboptimal_MPC
         %euler forward method, only first order approximation
         x_save(:,i+1) = x_save(:,i) + dt * non_lin_model(x_save(:,i),u(:,1));
     end
+    
+    %time estimate single run
+    if rr_suboptimal_MPC == 2
+        tic
+        Controller_suboptimal_MPC(x_save(:,1),zeros(N_inputs, N_horizon)); 
+        time_sub_MPC = toc;
+        tic
+        Controller_suboptimal_MPC(x_save(:,i+1),u_tilde); 
+        time_sub_MPC = [time_sub_MPC, toc];
+    else
+        tic
+        Controller_MPC(x_save(:,1)); 
+        time_MPC = toc;
+        tic
+        Controller_MPC(x_save(:,i+1)); 
+        time_MPC = [time_MPC, toc];
+    end
 end
 
 %% run system with optimal LQR feedback
