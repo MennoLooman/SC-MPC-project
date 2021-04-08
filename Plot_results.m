@@ -6,7 +6,9 @@ if rr_suboptimal_MPC
     if length(x_save(:,1)) == 7
         x_save_8 = recover_eight_state(x_save);
     elseif length(x_save(:,1)) == 8
-        x_save_8 = x_save;
+        x_save(1:4,:) = x_save(1:4,:);
+        x_save(5,:) = x_save(8,:);
+        x_save(6:8,:) = x_save(5:7,:);
     else
         error("error converting state to 8 states");
     end
@@ -49,8 +51,8 @@ if rr_suboptimal_MPC
     %note that the state is: x=[w_1 w_2 w_3 w_w e_1 e_2 e_3, n]' with n last
     nexttile
     hold on
-    for i = [1:3 5:7]
-        plot(t,x_save(i,2:end),'DisplayName',"x_"+num2str(i))
+    for i = [1:3 6:8]
+        plot(t,x_save_8(i,2:end),'DisplayName',"x_"+num2str(i))
     end
     hold off
     axis([-inf inf -1 1])
@@ -59,10 +61,9 @@ if rr_suboptimal_MPC
     title('States over time')
 
     nexttile
-    if rr_non_lin_model, plot_range = [4,8]; else, plot_range = 4; end
     hold on
-    for i = plot_range
-        plot(t,x_save(i,2:end),'DisplayName',"x_"+num2str(i))
+    for i = [4,5]
+        plot(t,x_save_8(i,2:end),'DisplayName',"x_"+num2str(i))
     end
     hold off
     xlabel('Time [sec]')
@@ -94,7 +95,9 @@ if rr_solve_DARE==2
     if length(x_LQR(:,1)) == 7
         x_LQR_8 = recover_eight_state(x_LQR);
     elseif length(x_LQR(:,1)) == 8
-        x_LQR_8 = x_LQR;
+        x_LQR_8(1:4,:) = x_LQR(1:4,:);
+        x_LQR_8(5,:) = x_LQR(8,:);
+        x_LQR_8(6:8,:) = x_LQR(5:7,:);
     else
         error("error converting state to 8 states");
     end
@@ -137,8 +140,8 @@ if rr_solve_DARE==2
     %note that the state is: x=[w_1 w_2 w_3 w_w e_1 e_2 e_3, n]' with n last
     nexttile
     hold on
-    for i = [1:3 5:7]
-        plot(t,x_LQR(i,2:end),'DisplayName',"x_"+num2str(i))
+    for i = [1:3 6:8]
+        plot(t,x_LQR_8(i,2:end),'DisplayName',"x_"+num2str(i))
     end
     hold off
     axis([-inf inf -1 1])
@@ -147,10 +150,9 @@ if rr_solve_DARE==2
     title('States over time')
 
     nexttile
-    if rr_non_lin_model, plot_range = [4,8]; else, plot_range = 4; end
     hold on
-    for i = plot_range
-        plot(t,x_LQR(i,2:end),'DisplayName',"x_"+num2str(i))
+    for i = [4,5]
+        plot(t,x_LQR_8(i,2:end),'DisplayName',"x_"+num2str(i))
     end
     hold off
     xlabel('Time [sec]')
