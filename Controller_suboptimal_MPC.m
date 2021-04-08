@@ -28,13 +28,13 @@ function [u_result,x_result,Objective_result,Objective_result2] = Controller_sub
        Objective_u = Objective_u + 0.5* u_tot(:,k)'*R*u_tot(:,k);
        Objective_u_tilde = Objective_u_tilde + 0.5* x_tilde(:,k)'*Q*x_tilde(:,k);
        Objective_u_tilde = Objective_u_tilde + 0.5* u_tilde(:,k)'*R*u_tilde(:,k);
-       Constraints = [Constraints; x(:,k+1) <= max_state_bounds; x(:,k+1)>= -max_state_bounds];
+       Constraints = [Constraints; x(:,k+1) <= max_state_bounds+slack; x(:,k+1)>= -max_state_bounds-slack];
        Constraints = [Constraints; -ones(3,1) <= u_int{k} ; u_int{k} <=ones(3,1)];
        Constraints = [Constraints; -2e-3 <= u_var{k}      ; u_var{k} <= 2e-3];
     end
     Objective_u = Objective_u + 0.5*x(:,N_horizon+1)'*P*x(:,N_horizon+1);
     Objective_u_tilde = Objective_u_tilde + 0.5*x_tilde(:,N_horizon+1)'*P*x_tilde(:,N_horizon+1);
-    Constraints = [Constraints; Objective_u <= Objective_u_tilde + slack; slack>=0]; %sufficient condition!!! 
+    Constraints = [Constraints; Objective_u <= Objective_u_tilde; slack>=0]; %sufficient condition!!! 
 
     options = sdpsettings('solver','mosek','verbose',0,'mosek.MSK_IPAR_SIM_MAX_ITERATIONS',100);
     sol = optimize(Constraints,slack,options);

@@ -18,7 +18,17 @@ if rr_suboptimal_MPC
     for i = N_steps + (1:N_extra_steps)
         if rr_suboptimal_MPC == 2
             [u,x,obj,obj2] = Controller_suboptimal_MPC(x_save(:,i),u_tilde); 
-            u_tilde(:,1:N_horizon-1) = u(:,2:end); %last column of u_tilde is always zero
+            u_tilde(:,1:N_horizon-1) = u(:,2:end); 
+%             u_tilde(:,end) = K_LQR*x(:,end); %last column is optimal control with feasible input
+%             for j = 1:3
+%                 if u_tilde(j,end) > input_bounds(j)/3, u_tilde(j,end) = input_bounds(j); 
+%                 elseif u_tilde(j,end) < -input_bounds(j)/3, u_tilde(j,end) = -input_bounds(j);
+%                 else, u_tilde(j,end)=0; 
+%                 end
+%            end
+%            if u_tilde(4,end) > input_bounds(4), u_tilde(4,end) = input_bounds(4);
+%            elseif u_tilde(4,end) < -input_bounds(4), u_tilde(4,end) = -input_bounds(4);
+%            end
             obj2_save(i) = obj2;
         else
             [u,x,obj] = Controller_MPC(x_save(:,i)); 
