@@ -25,6 +25,28 @@ legend(); title('Orientation of satellite in Euler angles');
 xlabel('Time [sec]'); ylabel('Angle [deg]');
 
 if rr_suboptimal_MPC
+    %euler angles
+    if length(x_save(:,1)) == 7
+        x_save_8 = recover_eight_state(x_save);
+    elseif length(x_save(:,1)) == 8
+        x_save_8 = x_save;
+    else
+        error("error converting state to 8 states");
+    end
+    % convert quaternions to euler angles.
+    euler = zeros(3, length(x_save_8));
+    for i =1:length(x_save_8)
+        euler(:,i) = rad2deg(quat2eul(x_save_8(5:8, i)'));
+    end
+
+    fig10 = figure(); hold on; grid on; % Plot euler angles
+    plot(t, euler(1,2:end), 'DisplayName','yaw', 'LineWidth', 2);
+    plot(t, euler(2,2:end), 'DisplayName','pitch', 'LineWidth', 2);
+    plot(t, euler(3,2:end), 'DisplayName','roll', 'LineWidth', 2);
+    legend(); title('Orientation of satellite in Euler angles');
+    xlabel('Time [sec]'); ylabel('Angle [deg]');
+    %-------------
+    
     fig1 = figure();
     til1 = tiledlayout(2,2);
 
@@ -91,6 +113,28 @@ end
 
 %% plot results of LQR optimal control
 if rr_solve_DARE==2
+    %euler parameters
+    if length(x_LQR(:,1)) == 7
+        x_LQR_8 = recover_eight_state(x_LQR);
+    elseif length(x_LQR(:,1)) == 8
+        x_LQR_8 = x_LQR;
+    else
+        error("error converting state to 8 states");
+    end
+    % convert quaternions to euler angles.
+    euler = zeros(3, length(x_LQR_8));
+    for i =1:length(x_LQR_8)
+        euler(:,i) = rad2deg(quat2eul(x_LQR_8(5:8, i)'));
+    end
+
+    fig10 = figure(); hold on; grid on; % Plot euler angles
+    plot(t, euler(1,2:end), 'DisplayName','yaw', 'LineWidth', 2);
+    plot(t, euler(2,2:end), 'DisplayName','pitch', 'LineWidth', 2);
+    plot(t, euler(3,2:end), 'DisplayName','roll', 'LineWidth', 2);
+    legend(); title('Orientation of satellite in Euler angles');
+    xlabel('Time [sec]'); ylabel('Angle [deg]');
+    %-----------
+    
     fig3 = figure();
     til3 = tiledlayout(2,2);
 
