@@ -1,4 +1,4 @@
-function [u_result,x_result,Objective_result,Objective_result2] = Controller_suboptimal_MPC(x0_var,u_tilde)
+function [u_result,x_result,Objective_result,Objective_result2,V_f_result,l_N_result] = Controller_suboptimal_MPC(x0_var,u_tilde)
     global N_horizon
     global N_inputs
     global A_dis
@@ -42,4 +42,6 @@ function [u_result,x_result,Objective_result,Objective_result2] = Controller_sub
     x_result = value(x);
     Objective_result = value(Objective_u);
     Objective_result2 = value(Objective_u_tilde);
+    V_f_result = 0.5*x_result(:,N_horizon+1)'*P*x_result(:,N_horizon+1);
+    l_N_result = 0.5* x_result(:,k)'*Q*x_result(:,N_horizon)+0.5* u_result(:,k)'*R*u_result(:,N_horizon);
 end

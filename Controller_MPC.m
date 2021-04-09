@@ -1,4 +1,4 @@
-function [u_result,x_result,Objective_result,sol] = Controller_MPC(x0_var)
+function [u_result,x_result,Objective_result,V_f_result,l_N_result] = Controller_MPC(x0_var)
     global N_horizon
     global N_inputs
     global A_dis
@@ -33,4 +33,6 @@ function [u_result,x_result,Objective_result,sol] = Controller_MPC(x0_var)
     u_result = value(u_tot);
     x_result = value(x);
     Objective_result = value(Objective);
+    V_f_result = 0.5*x_result(:,N_horizon+1)'*P*x_result(:,N_horizon+1);
+    l_N_result = 0.5* x_result(:,k)'*Q*x_result(:,N_horizon)+0.5* u_result(:,k)'*R*u_result(:,N_horizon);
 end

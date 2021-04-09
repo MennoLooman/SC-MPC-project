@@ -24,6 +24,8 @@ x_LQR = x0;
 u_LQR = [];
 obj_save = [];
 obj2_save = [];
+Vf_save = [];
+lN_save = [];
 
 %% Continuous state space model
 [A_con,B_con] = con_System();

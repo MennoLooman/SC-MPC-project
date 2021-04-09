@@ -1,37 +1,27 @@
 %% plot results
 t = 0:dt:dt*(N_steps-1);
 
-if length(x_save(:,1)) == 7
-    x_save_8 = recover_eight_state(x_save);
-elseif length(x_save(:,1)) == 8
-    x_save_8 = x_save;
-else
-    error("error converting state to 8 states");
-end
-
-% convert quaternions to euler angles.
-euler = zeros(3, length(x_save_8));
-for i =1:length(x_save_8)
-    euler(:,i) = rad2deg(quat2eul(x_save_8(5:8, i)'));
-end
-
-save(strcat('Simulation_result_N_', num2str(N_horizon),'_suboptimal'), 'euler', 'obj_save', 'x_save', 'u_save', 'Q', 'R');
-
-figure(10); hold on; grid on; % Plot euler angles
-plot(t, euler(1,2:end), 'DisplayName','yaw', 'LineWidth', 2);
-plot(t, euler(2,2:end), 'DisplayName','pitch', 'LineWidth', 2);
-plot(t, euler(3,2:end), 'DisplayName','roll', 'LineWidth', 2);
-legend(); title('Orientation of satellite in Euler angles');
-xlabel('Time [sec]'); ylabel('Angle [deg]');
-
 if rr_suboptimal_MPC
+    %plot assumption 2.14
+    Vf_diff = Vf_save(2:end) + lN_save(2:end) - Vf_save(1:end-1);
+    fig12 = figure();
+    plot(t(1:end-1),Vf_diff,'DisplayName','V_f(x_N_+_1)+l(x_N,u_N)-V_f(x_N)', 'LineWidth', 2);
+    hold on
+    plot(t(1:end-1),zeros(1,N_steps-1),'DisplayName','zero reference', 'LineWidth', 2);
+    hold off; grid on; legend;
+    title('Assumption 2.14: V_f(x_N_+_1)+l(x_N,u_N)-V_f(x_N)<=0');
+    axis([0,20,-0.55,0.16]);
+    xlabel('Time [sec]'); 
+    ylabel('Value [-]');
+    %------------
     %euler angles
+    x_save_8 = zeros(8,N_steps+1);
     if length(x_save(:,1)) == 7
         x_save_8 = recover_eight_state(x_save);
     elseif length(x_save(:,1)) == 8
-        x_save(1:4,:) = x_save(1:4,:);
-        x_save(5,:) = x_save(8,:);
-        x_save(6:8,:) = x_save(5:7,:);
+        x_save_8(1:4,:) = x_save(1:4,:);
+        x_save_8(5,:) = x_save(8,:);
+        x_save_8(6:8,:) = x_save(5:7,:);
     else
         error("error converting state to 8 states");
     end

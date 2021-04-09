@@ -23,15 +23,19 @@ if rr_suboptimal_MPC
     x_save = [x_save, zeros(N_states, N_extra_steps)];
     u_save = [u_save, zeros(N_inputs, N_extra_steps)];
     obj_save = [obj_save, zeros(1,N_extra_steps)];
+    Vf_save = [Vf_save, zeros(1, N_extra_steps)];
+    lN_save = [lN_save, zeros(1, N_extra_steps)];
 
     for i = N_steps + (1:N_extra_steps)
         if rr_suboptimal_MPC == 2
-            [u,x,obj,obj2] = Controller_suboptimal_MPC(x_save(1:N_states-1,i),u_tilde); 
+            [u,x,obj,obj2,Vf,lN] = Controller_suboptimal_MPC(x_save(1:N_states-1,i),u_tilde); 
             u_tilde(:,1:N_horizon-1) = u(:,2:end); %last column of u_tilde is always zero
             obj2_save(i) = obj2;
         else
-            [u,x,obj] = Controller_MPC(x_save(1:N_states-1,i)); 
+            [u,x,obj,Vf,lN] = Controller_MPC(x_save(1:N_states-1,i)); 
         end 
+        Vf_save(i) = Vf;
+        lN_save(i) = lN;
         obj_save(i) = obj;
         u_save(:,i) = u(:,1);
         %euler forward method, only first order approximation
