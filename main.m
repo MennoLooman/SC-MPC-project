@@ -27,9 +27,9 @@ flag_model_type = 1;        % [0/1]   use linearization / use nonlinear model fo
 flag_P_type = 1;            % [0/1/2] use P=I / DARE -> P / LQR infinite horizon optimal feedback
 
 % Simulation parameters 
-x0_quat = eul2quat([deg2rad(1.0), deg2rad(1.0), deg2rad(5.0)], 'XYZ'); % initial quaternion based on euler angles in order: roll - pitch - yaw
-x0 = [0.0 0.0 0.0 0.0 x0_quat(2:4)]';   % initial state
-N_extra_steps = 200;                    % number of steps take during simulation
+x0_quat = eul2quat([deg2rad(1.0), deg2rad(1.0), deg2rad(5.0)], 'XYZ'); 
+x0 = [0.0 0.0 0.0 0.0 x0_quat(2:4)]';           % initial state
+N_extra_steps = 200;                            % number of steps take during simulation
 
 %% define system
 def_sys;
