@@ -2,8 +2,9 @@ N_states = 8;
 %% run MPC controller
 if size(x_save) == [7,1]
     %adding initial value for euler parameter n
-    x_save = [x_save;1]; 
-    x_LQR = [x_LQR;1];
+    eta = sqrt(1 - x_save(5:7)'*x_save(5:7));
+    x_save = [x_save;eta]; 
+    x_LQR = [x_LQR;eta];
 end
 if rr_suboptimal_MPC
     %nonlinear model uses the extra (uncontrolable, unobservable) euler parameter
@@ -40,17 +41,17 @@ if rr_suboptimal_MPC
     %time estimate single run
     if rr_suboptimal_MPC == 2
         tic
-        Controller_suboptimal_MPC(x_save(:,1),zeros(N_inputs, N_horizon)); 
+        Controller_suboptimal_MPC(x_save(1:7,1),zeros(N_inputs, N_horizon)); 
         time_sub_MPC = toc;
         tic
-        Controller_suboptimal_MPC(x_save(:,i+1),u_tilde); 
+        Controller_suboptimal_MPC(x_save(1:7,i+1),u_tilde); 
         time_sub_MPC = [time_sub_MPC, toc];
     else
         tic
-        Controller_MPC(x_save(:,1)); 
+        Controller_MPC(x_save(1:7,1)); 
         time_MPC = toc;
         tic
-        Controller_MPC(x_save(:,i+1)); 
+        Controller_MPC(x_save(1:7,i+1)); 
         time_MPC = [time_MPC, toc];
     end
 end

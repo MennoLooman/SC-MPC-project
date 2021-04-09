@@ -12,7 +12,7 @@ function [u_result,x_result,Objective_result,sol] = Controller_MPC(x0_var)
     x = [x0_var, sdpvar(7,N_horizon)];
     u_int = intvar(repmat(N_inputs-1,1,N_horizon), ones(1,N_horizon));
     u_var = sdpvar(repmat(1,1,N_horizon), ones(1,N_horizon));
-    u_tot = sdpvar(N_inputs,N_horizon);
+    u_tot = sdpvar(N_inputs,N_horizon,'full');
 
     Constraints = [];
     Objective = 0;

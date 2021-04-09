@@ -9,11 +9,11 @@ function [u_result,x_result,Objective_result,Objective_result2] = Controller_sub
     global Q
     global P
     %% Objective Function LQR
-    x = [x0_var, sdpvar(7,N_horizon)];
+    x = [x0_var, sdpvar(7,N_horizon,'full')];
     u_int = intvar(repmat(N_inputs-1,1,N_horizon), ones(1,N_horizon));
     u_var = sdpvar(repmat(1,1,N_horizon), ones(1,N_horizon));
-    u_tot = sdpvar(N_inputs,N_horizon);
-    x_tilde = [x0_var, sdpvar(7,N_horizon)];
+    u_tot = sdpvar(N_inputs,N_horizon,'full');
+    x_tilde = [x0_var, sdpvar(7,N_horizon,'full')];
     slack = sdpvar(1);
 
     Constraints = [];
