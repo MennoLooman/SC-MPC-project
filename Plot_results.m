@@ -30,6 +30,9 @@ if rr_suboptimal_MPC
     for i =1:length(x_save_8)
         euler(:,i) = rad2deg(quat2eul(x_save_8(5:8, i)'));
     end
+    
+    save(strcat('Simulation_result_N_', num2str(N_horizon),'_suboptimal'), 'euler', 'obj_save', 'x_save', 'u_save', 'Q', 'R');
+
 
     fig10 = figure(); hold on; grid on; % Plot euler angles
     plot(t, euler(1,2:end), 'DisplayName','yaw', 'LineWidth', 2);
