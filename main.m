@@ -1,4 +1,5 @@
 %{
+!YALMIP and MOSEK are needed to successfully run the code!
 Main Matlab script used for simulation of the micro satellite. Part of
 practical asignment of the Model Predictive Course (SC42145) of the Delft
 University of Technology.
@@ -14,17 +15,17 @@ last the P that is used can be chosen.
 %}
 yalmip('clear'); clear all; clc;
 
+% Flags
+flag_MPC_type = 1;          % [0/1/2] dont run / run MPC / run suboptimal MPC
+flag_model_type = 1;        % [0/1]   use linearization / use nonlinear model for simulation
+flag_P_type = 2;            % [0/1/2] P=I (not recommended) / DARE -> P / LQR infinite horizon optimal feedback
+
 % Tuning parameters
 global N_horizon R Q
 N_horizon = 5;                                  % Prediction horizon
 beta = 10;                                      % Weight of terminal cost
 Q = diag([500, 500, 500, 1e-7, 20, 20, 20]);    % State weight
 R = diag([5, 5, 5, 1]);                         % Input weight
-
-% Flags
-flag_MPC_type = 2;          % [0/1/2] dont run / run MPC / run suboptimal MPC
-flag_model_type = 1;        % [0/1]   use linearization / use nonlinear model for simulation
-flag_P_type = 1;            % [0/1/2] use P=I / DARE -> P / LQR infinite horizon optimal feedback
 
 % Simulation parameters 
 x0_quat = eul2quat([deg2rad(1.0), deg2rad(1.0), deg2rad(5.0)], 'XYZ'); 

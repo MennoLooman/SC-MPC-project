@@ -10,7 +10,6 @@ if flag_MPC_type
     plot(t(1:end-1),zeros(1,N_steps-1),'DisplayName','zero reference', 'LineWidth', 2);
     hold off; grid on; legend;
     title('Assumption 2.14: V_f(x_N_+_1)+l(x_N,u_N)-V_f(x_N)<=0');
-    axis([0,20,-0.55,0.16]);
     xlabel('Time [sec]'); 
     ylabel('Value [-]');
     %------------
