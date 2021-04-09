@@ -6,10 +6,10 @@ if size(x_save) == [7,1]
     x_save = [x_save;eta]; 
     x_LQR = [x_LQR;eta];
 end
-if rr_suboptimal_MPC
+if flag_MPC_type
     %nonlinear model uses the extra (uncontrolable, unobservable) euler parameter
     %the suboptimal MPC uses the warm start u_tilde to have a reference input
-    if rr_suboptimal_MPC == 2
+    if flag_MPC_type == 2
         obj2_save = [obj2_save, zeros(1,N_extra_steps)];
         if length(u_save) <= N_horizon
             %this initial input needs to be valid for first N_horizon steps!
@@ -27,7 +27,7 @@ if rr_suboptimal_MPC
     lN_save = [lN_save, zeros(1, N_extra_steps)];
 
     for i = N_steps + (1:N_extra_steps)
-        if rr_suboptimal_MPC == 2
+        if flag_MPC_type == 2
             [u,x,obj,obj2,Vf,lN] = Controller_suboptimal_MPC(x_save(1:N_states-1,i),u_tilde); 
             u_tilde(:,1:N_horizon-1) = u(:,2:end); %last column of u_tilde is always zero
             obj2_save(i) = obj2;
@@ -43,7 +43,7 @@ if rr_suboptimal_MPC
     end
     
     %time estimate single run
-    if rr_suboptimal_MPC == 2
+    if flag_MPC_type == 2
         tic
         Controller_suboptimal_MPC(x_save(1:7,1),zeros(N_inputs, N_horizon)); 
         time_sub_MPC = toc;
@@ -61,7 +61,7 @@ if rr_suboptimal_MPC
 end
 
 %% run system with optimal LQR feedback
-if rr_solve_DARE==2
+if flag_P_type==2
     x_LQR = [x_LQR, zeros(N_states, N_extra_steps)];
     u_LQR = [u_LQR, zeros(N_inputs, N_extra_steps)];
     for i = N_steps + (1:N_extra_steps)

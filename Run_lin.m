@@ -1,6 +1,6 @@
 %% run MPC controller
-if rr_suboptimal_MPC
-    if rr_suboptimal_MPC == 2
+if flag_MPC_type
+    if flag_MPC_type == 2
         obj2_save = [obj2_save, zeros(1,N_extra_steps)];
         if length(u_save) <= N_horizon
             %this initial input needs to be valid for first N_horizon steps!
@@ -18,7 +18,7 @@ if rr_suboptimal_MPC
     lN_save = [lN_save, zeros(1, N_extra_steps)];
         
     for i = N_steps + (1:N_extra_steps)
-        if rr_suboptimal_MPC == 2
+        if flag_MPC_type == 2
             [u,x,obj,obj2,Vf,lN] = Controller_suboptimal_MPC(x_save(:,i),u_tilde); 
             u_tilde(:,1:N_horizon-1) = u(:,2:end); 
 %             u_tilde(:,end) = K_LQR*x(:,end); %last column is optimal control with feasible input
@@ -43,7 +43,7 @@ if rr_suboptimal_MPC
     end
     
     %time estimate single run
-    if rr_suboptimal_MPC == 2
+    if flag_MPC_type == 2
         tic
         Controller_suboptimal_MPC(x_save(:,1),zeros(N_inputs, N_horizon)); 
         time_sub_MPC = toc;
@@ -61,7 +61,7 @@ if rr_suboptimal_MPC
 end
 
 %% run system with optimal LQR feedback
-if rr_solve_DARE==2
+if flag_P_type==2
     x_LQR = [x_LQR, zeros(N_states, N_extra_steps)];
     u_LQR = [u_LQR, zeros(N_inputs, N_extra_steps)];
     for i = N_steps + (1:N_extra_steps)

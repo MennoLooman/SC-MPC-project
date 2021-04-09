@@ -17,6 +17,7 @@ global P
 
 N_inputs = 4;
 N_states = 7;
+dt = 0.1;                               % sampling rate
 N_steps = 0;
 x_save = x0;
 u_save = [];
@@ -50,4 +51,4 @@ input_bounds = [0.0484; 0.0484; 0.0398; 0.0020];
 int_in_bounds = diag(input_bounds(1:3)); 
 
 %% def LQR terms
-P = P_gain*eye(N_states);
+P = beta*eye(N_states);

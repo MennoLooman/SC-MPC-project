@@ -1,7 +1,7 @@
 %% plot results
 t = 0:dt:dt*(N_steps-1);
 
-if rr_suboptimal_MPC
+if flag_MPC_type
     %plot assumption 2.14
     Vf_diff = Vf_save(2:end) + lN_save(2:end) - Vf_save(1:end-1);
     fig12 = figure();
@@ -87,7 +87,7 @@ if rr_suboptimal_MPC
     title('States over time')
     
     fig4 = figure();
-    if rr_suboptimal_MPC==2
+    if flag_MPC_type==2
         title_MPC = "Suboptimal MPC "; 
         plot(t,obj_save,'DisplayName',"New found cost");
         hold on 
@@ -101,12 +101,12 @@ if rr_suboptimal_MPC
     legend
     title("Objective Cost funtion V_N(x,u) of "+title_MPC);
     
-    if rr_non_lin_model, title_lin = "with nonlinear model"; else, title_lin = "with linearized model"; end
+    if flag_model_type, title_lin = "with nonlinear model"; else, title_lin = "with linearized model"; end
     title(til1,title_MPC+title_lin)
 end
 
 %% plot results of LQR optimal control
-if rr_solve_DARE==2
+if flag_P_type==2
     %euler parameters
     if length(x_LQR(:,1)) == 7
         x_LQR_8 = recover_eight_state(x_LQR);

@@ -1,38 +1,48 @@
+%{
+Main Matlab script used for simulation of the micro satellite. Part of
+practical asignment of the Model Predictive Course (SC42145) of the Delft
+University of Technology.
+
+Written by:
+- Menno Looman
+- Danny Looman
+
+With the flags defined in the first block of the main file the execution of
+of the script can be set to: simulate no MPC / normal MPC / suboptimal MPC.
+Also the model can be switched from linear model to nonlinear model. At
+last the P that is used can be chosen.
+%}
 yalmip('clear'); clear all; clc;
 
-% parameters
-% initial quaternion based on euler angles in order: roll - pitch - yaw
-x0_quat = eul2quat([deg2rad(1.0), deg2rad(1.0), deg2rad(5.0)], 'XYZ');
+% Tuning parameters
+global N_horizon R Q
+N_horizon = 5;                                  % Prediction horizon
+beta = 10;                                      % Weight of terminal cost
+Q = diag([500, 500, 500, 1e-7, 20, 20, 20]);    % State weight
+R = diag([5, 5, 5, 1]);                         % Input weight
+
+% Flags
+flag_MPC_type = 2;          % [0/1/2] dont run / run MPC / run suboptimal MPC
+flag_model_type = 1;        % [0/1]   use linearization / use nonlinear model for simulation
+flag_P_type = 1;            % [0/1/2] use P=I / DARE -> P / LQR infinite horizon optimal feedback
+
+% Simulation parameters 
+x0_quat = eul2quat([deg2rad(1.0), deg2rad(1.0), deg2rad(5.0)], 'XYZ'); % initial quaternion based on euler angles in order: roll - pitch - yaw
 x0 = [0.0 0.0 0.0 0.0 x0_quat(2:4)]';   % initial state
-dt = 0.1;                               % sampling rate
-N_extra_steps = 200;                    % number of steps each run
-global N_horizon
-global R
-global Q
-
-%tuning
-N_horizon = 5;                          % 
-P_gain = 10;                          % weight of terminal cost
-Q = diag([500, 500, 500, 1e-7, 20, 20, 20]);
-R = diag([5, 5, 5, 1]);
-
-%flags
-rr_suboptimal_MPC = 2;       % [0/1/2] dont run / run MPC / run suboptimal MPC
-rr_non_lin_model = 1;        % [0/1]   use linearization / use nonlinear model
-rr_solve_DARE = 1;           % [0/1/2] use P=I / DARE -> P / LQR infinite horizon optimal feedback
+N_extra_steps = 200;                    % number of steps take during simulation
 
 %% define system
 def_sys;
-if rr_solve_DARE, solve_DARE; end
-%--------------------------------------------------------------------------
-%% Run model with controller
-if ~rr_non_lin_model
-    %linear model
-    Run_lin;
-else
-    %nonlinear model
-    Run_non_lin;
+if flag_P_type 
+    solve_DARE; 
 end
-%--------------------------------------------------------------------------
+
+%% Run model with controller
+if flag_model_type
+    Run_non_lin; 
+else  
+    Run_lin; 
+end
+
 %% plot results
 Plot_results;
